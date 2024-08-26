@@ -1,3 +1,4 @@
+import 'dart:io' show SocketException;
 import 'package:http/http.dart' as http;
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_client.dart';
@@ -148,6 +149,8 @@ class OAuth2Helper {
           clientId: clientId,
           clientSecret: clientSecret,
           scopes: curTknResp.scope);
+    } on SocketException {
+      rethrow;
     } catch (_) {
       return await fetchToken();
     }
