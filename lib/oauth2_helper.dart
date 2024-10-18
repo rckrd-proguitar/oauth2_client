@@ -1,4 +1,5 @@
 import 'dart:io' show SocketException;
+
 import 'package:http/http.dart' as http;
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_client.dart';
@@ -140,8 +141,8 @@ class OAuth2Helper {
   }
 
   /// Performs a refresh_token request using the [refreshToken].
-  Future<AccessTokenResponse> refreshToken(
-      AccessTokenResponse curTknResp) async {
+  Future<AccessTokenResponse> refreshToken(AccessTokenResponse curTknResp,
+      {bool refetch = true}) async {
     AccessTokenResponse? tknResp;
     var refreshToken = curTknResp.refreshToken!;
     try {
@@ -167,6 +168,11 @@ class OAuth2Helper {
         //The refresh token is expired too
         await tokenStorage.deleteToken(scopes ?? []);
         //Fetch another access token
+        if (!refetch) {
+          throw OAuth2Exception('Error',
+              errorDescription:
+                  'Refetch = false, no valid refresh tokens, can not get token');
+        }
         tknResp = await getToken();
       } else {
         throw OAuth2Exception(tknResp.error ?? 'Error',
